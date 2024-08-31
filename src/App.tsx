@@ -9,7 +9,7 @@ const App = () => {
   const [knowsMacros, setKnowsMacros] = useState<boolean | null>(null);
   const [macros, setMacros] = useState({ protein: 0, carbs: 0, fats: 0 });
   const [totalCalories, setTotalCalories] = useState(0);
-  const [showTypingEffect, setShowTypingEffect] = useState(true);
+  const [showTypingEffect, _setShowTypingEffect] = useState(true);
 
   const handleMacrosSubmit = (submittedMacros: { protein: number; carbs: number; fats: number }) => {
     setMacros(submittedMacros);

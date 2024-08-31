@@ -42,7 +42,7 @@ const NoMacrosChoice: React.FC<NoMacrosChoiceProps> = ({ onCalculate }) => {
   const [bmr, setBmr] = useState<number>(0);
   const [proteinIntake, setProteinIntake] = useState<number>(1.3);
   const [carbFatSplit, setCarbFatSplit] = useState<number>(50);
-  const [macros, setMacros] = useState<Macros>({ protein: 0, carbs: 0, fats: 0 });
+  const [_macros, setMacros] = useState<Macros>({ protein: 0, carbs: 0, fats: 0 });
 
   const validateInput = (name: string, value: string): string => {
     if (value.trim() === '') return 'This field is required';

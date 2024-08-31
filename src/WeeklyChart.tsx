@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Lock, Unlock, Clipboard, Share2 } from 'lucide-react';
-import {Alert} from '../@/components/ui/alert'
+import {Alert, AlertDescription } from '../@/components/ui/alert'
 
 interface Macros {
   protein: number;
@@ -29,7 +29,7 @@ const InteractiveWeeklyChart: React.FC<InteractiveWeeklyChartProps> = ({ initial
   const [weeklyData, setWeeklyData] = useState<DailyData[]>([]);
   const [sliderValue, setSliderValue] = useState<number>(totalCalories);
   const [weeklyTotalCalories, setWeeklyTotalCalories] = useState<number>(totalCalories * 7);
-  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' | 'warning' } | null>(null);
 
 
   useEffect(() => {
@@ -59,6 +59,11 @@ const InteractiveWeeklyChart: React.FC<InteractiveWeeklyChartProps> = ({ initial
     updateCalories(newValue);
   };
 
+  const showAlert = (message: string, type: 'success' | 'error' | 'warning') => {
+    setAlert({ message, type });
+    setTimeout(() => setAlert(null), 3000);
+  };
+
   const updateCalories = (newDayCalories: number) => {
     if (selectedDay === null) return;
 
@@ -68,9 +73,10 @@ const InteractiveWeeklyChart: React.FC<InteractiveWeeklyChartProps> = ({ initial
     const unlockedDays = weeklyData.filter((day, index) => !day.isBlocked && index !== selectedDay);
     
     if (unlockedDays.length === 0) {
-      alert("Cannot adjust calories. All other days are blocked.");
+      showAlert("Cannot adjust calories. All other days are blocked.", 'warning');
       return;
     }
+  
 
     const caloriesPerOtherDay = calorieDifference / unlockedDays.length;
 
@@ -175,25 +181,29 @@ const InteractiveWeeklyChart: React.FC<InteractiveWeeklyChartProps> = ({ initial
   const copyToClipboard = () => {
     const text = generateShareText();
     navigator.clipboard.writeText(text).then(() => {
-      setAlertMessage("Copied to clipboard successfully!");
-      setTimeout(() => setAlertMessage(null), 300);
+      showAlert("Copied to clipboard successfully!", 'success');
     }, (err) => {
       console.error('Could not copy text: ', err);
-      setAlertMessage("Failed to copy to clipboard.");
-      setTimeout(() => setAlertMessage(null), 300);
+      showAlert("Failed to copy to clipboard.", 'error');
     });
   };
-
+  
   const shareToWhatsApp = () => {
     const text = encodeURIComponent(generateShareText());
     const whatsappUrl = `https://wa.me/?text=${text}`;
     window.open(whatsappUrl, '_blank');
-    setAlertMessage("WhatsApp sharing initiated!");
-    setTimeout(() => setAlertMessage(null), 3000);
+    showAlert("WhatsApp sharing initiated!", 'success');
   };
+  
+  
 
   return (
     <div className="w-full mt-2">
+      {alert && (
+      <Alert variant={alert.type === 'success' ? 'default' : 'destructive'} className="mb-4">
+        <AlertDescription>{alert.message}</AlertDescription>
+      </Alert>
+    )}
       <ResponsiveContainer width="100%" height={450}>
         <BarChart 
           data={weeklyData} 
