@@ -72,7 +72,20 @@ const App = () => {
             )}
           </div>
         )}
+<footer className="absolute bottom-0 left-0 right-0 w-full text-center py-2 bg-[#FFFFF0]">
+  <p className="text-xl">
+    Built by <a 
+      href="https://www.instagram.com/lift_with_daniel/" 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="text-blue-600 hover:text-blue-800 underline"
+    >
+      Coach Daniel
+    </a>
+  </p>
+</footer>
       </div>
+      
     </div>
   );
 };
