@@ -19,7 +19,7 @@ const App = () => {
 
   return (
     <div className={`min-h-screen flex flex-col bg-[#FFFFF0] ${knowsMacros === null ? 'justify-center' : 'pt-10'}`}>
-      <div className="container mx-auto px-4 flex flex-col items-center">
+      <div className="flex-grow container mx-auto px-4 flex flex-col items-center">
         <h1 className="text-6xl md:text-8xl font-bold text-center mb-10">
           {showTypingEffect ? (
             <TypingEffect text="Calorie Banking" />
@@ -72,7 +72,8 @@ const App = () => {
             )}
           </div>
         )}
-<footer className="w-full text-center py-5 bg-[#FFFFF0]">
+      </div>
+      <footer className="w-full text-center py-5 bg-[#FFFFF0] mt-auto">
         <p className="text-sm">
           Built by <a 
             href="https://www.instagram.com/lift_with_daniel/" 
@@ -84,8 +85,6 @@ const App = () => {
           </a>
         </p>
       </footer>
-      </div>
-      
     </div>
   );
 };
