@@ -47,3 +47,5 @@ The calorie calculation currently works only with the metric system.
 npm i
 
 npm run dev
+
+or you can just use it here: https://dnielgonzlz.github.io/calorie-banking/
