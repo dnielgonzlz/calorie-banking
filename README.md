@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="src/assets/calorie_banking.gif" alt="Calorie Banking Calculator">
+  <img src="src/assets/calorie_bank.gif" alt="Calorie Banking Calculator">
 </p>
 
 # Calorie Banking
