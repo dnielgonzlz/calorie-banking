@@ -4,48 +4,74 @@
 
 # Calorie Banking
 
-Distribute your weekly calories by using a slider to increase or decrease the calories from a day, and it will automatically adjust the other days of the week.
-Features
+Calorie Banking is a web-based tool built with React that helps you flexibly distribute your weekly calorie intake by "banking" calories from one day to use on another. Perfect for people who want to have higher calorie days (e.g., for social events) without breaking their weekly calorie goals.
 
-## Features 
+## How It Works
 
-**Automatically calculates your daily calorie needs and macronutrient breakdown if you don't know them already.**
+Calorie Banking applies the principle that your body responds to caloric balance over time, not just daily intake. Instead of rigidly sticking to the same calorie target every day, this app lets you:
 
-**Customizable Protein Intake:**
+1. Decrease calories on some days
+2. "Bank" those calories for other days
+3. Maintain the same weekly total
 
-Choose how many grams of protein you want per unit of bodyweight.
+When you adjust one day's intake, the app automatically redistributes calories across other days, keeping your weekly total and protein levels constant.
 
-**Flexible Carb and Fat Distribution:**
+## Features
 
-Split the remaining calories between carbohydrates and fats according to your preference.
+- **Automatic Calorie & Macro Calculation**: Enter your age, height, weight, activity level, and sex to have your daily needs calculated automatically.
 
-**Dynamic Calorie Adjustment:**
+- **Manual Macro Input**: Already know your macros? Enter them directly.
 
-When you increase or decrease the calories for a specific day, it maintains the protein amount (as this is based on your bodyweight) and adjusts carbs and fats accordingly.
+- **Protein-First Approach**: The app maintains your protein intake (based on bodyweight) while adjusting carbs and fats.
 
-**Day Locking:**
+- **Customizable Protein Targets**: Select protein intake from 1.3g to 2.3g per kg of bodyweight.
 
-Ability to 'lock' a specific day so that adjustments to other days don't affect the locked day.
+- **Flexible Carb/Fat Distribution**: Choose how to split your remaining calories between carbohydrates and fats.
+
+- **Interactive Bar Chart**: Visually see and adjust your daily calorie distribution.
+
+- **Day Locking**: Lock specific days so they remain untouched when other days are adjusted.
+
+- **Adjustable Slider**: Fine-tune each day's calories with an easy slider interface.
+
+- **Sharing Options**: Copy your plan to clipboard or share directly to WhatsApp to send to friends or nutrition coaches.
+
+- **Reset Option**: Easily revert to your original even distribution if needed.
 
 ## Usage
 
-Enter your personal details (age, gender, weight, height, activity level) to calculate your base calorie needs.
+1. Choose whether you know your macros or need them calculated
+2. If calculating:
+   - Enter your personal details (age, sex, weight, height, activity level)
+   - Select your protein intake per kg of bodyweight
+   - Choose your preferred carb/fat ratio
+3. Use the interactive chart to:
+   - Click on any day to select it
+   - Adjust the slider to change that day's calories
+   - Lock/unlock days as needed
+4. Share your plan with others or reset to start over
 
-Set your desired protein intake per unit of bodyweight.
+## Technical Notes
 
-Adjust the carb/fat ratio for your remaining calories.
-
-Use the sliders to redistribute calories across your week as desired.
-
-Lock any days you don't want to be affected by further adjustments.
-
-## Note
-The calorie calculation currently works only with the metric system.
+- Built with React and TypeScript
+- Uses Recharts for data visualization
+- Implements Tailwind CSS for styling
+- Calculates BMR using standard formulas
+- Ensures macronutrient balance is maintained when redistributing calories
+- Guarantees minimum essential fat intake even on lower calorie days
+- Currently works with metric measurements (kg/cm)
 
 ## Installation
 
+```
 npm i
-
 npm run dev
+```
 
-or you can just use it here: https://dnielgonzlz.github.io/calorie-banking/
+Or use the hosted version at: https://dnielgonzlz.github.io/calorie-banking/
+
+## Support the Developer
+
+If you find this tool useful, consider [buying the developer a coffee](https://www.buymeacoffee.com/danielgonzalez).
+
+Built by [Coach Daniel](https://www.instagram.com/lift_with_daniel/)
