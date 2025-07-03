@@ -1,112 +1,189 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 
-interface Macros {
-  protein: string;
-  fats: string;
-  carbs: string;
-}
+// Constants
+const MACRO_TYPES = {
+  protein: { label: 'Protein', multiplier: 4, unit: 'grams' },
+  fats: { label: 'Fats', multiplier: 9, unit: 'grams' },
+  carbs: { label: 'Carbs', multiplier: 4, unit: 'grams' }
+} as const;
 
-interface NumericMacros {
-  protein: number;
-  fats: number;
-  carbs: number;
-}
+const VALIDATION_MESSAGES = {
+  required: 'This field is required',
+  invalidFormat: 'Only positive whole numbers are allowed',
+  invalidValue: 'Value must be greater than 0'
+} as const;
+
+// Types
+type MacroType = keyof typeof MACRO_TYPES;
+type MacroValues = Record<MacroType, string>;
+type MacroErrors = Partial<Record<MacroType, string>>;
+type NumericMacros = Record<MacroType, number>;
 
 interface MacroInputProps {
   onSubmit: (macros: NumericMacros) => void;
 }
 
-const MacroInput: React.FC<MacroInputProps> = ({ onSubmit }) => {
-  const [macros, setMacros] = useState<Macros>({
-    protein: '',
-    fats: '',
-    carbs: ''
-  });
-
-  const [errors, setErrors] = useState<Macros>({
-    protein: '',
-    fats: '',
-    carbs: ''
-  });
-
-  const validateInput = (value: string): string => {
-    if (value.trim() === '') return 'This field is required';
-    if (!/^\d+$/.test(value)) return 'Only positive whole numbers are allowed';
-    if (parseInt(value) <= 0) return 'Value must be greater than 0';
+// Custom hook for validation
+const useValidation = () => {
+  const validateInput = useCallback((value: string): string => {
+    if (value.trim() === '') return VALIDATION_MESSAGES.required;
+    if (!/^\d+$/.test(value)) return VALIDATION_MESSAGES.invalidFormat;
+    if (parseInt(value) <= 0) return VALIDATION_MESSAGES.invalidValue;
     return '';
-  };
+  }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const validateAllInputs = useCallback((macros: MacroValues): MacroErrors => {
+    const errors: MacroErrors = {};
+    
+    (Object.keys(MACRO_TYPES) as MacroType[]).forEach(key => {
+      const error = validateInput(macros[key]);
+      if (error) errors[key] = error;
+    });
+    
+    return errors;
+  }, [validateInput]);
+
+  return { validateAllInputs };
+};
+
+// Utility functions
+const calculateCalories = (grams: string, multiplier: number): string => {
+  const parsedGrams = parseInt(grams) || 0;
+  return (parsedGrams * multiplier).toFixed(0);
+};
+
+const convertToNumericMacros = (macros: MacroValues): NumericMacros => {
+  return (Object.keys(MACRO_TYPES) as MacroType[]).reduce((acc, key) => {
+    acc[key] = parseInt(macros[key]);
+    return acc;
+  }, {} as NumericMacros);
+};
+
+// Main component
+const MacroInput: React.FC<MacroInputProps> = ({ onSubmit }) => {
+  const [macros, setMacros] = useState<MacroValues>({
+    protein: '',
+    fats: '',
+    carbs: ''
+  });
+
+  const [errors, setErrors] = useState<MacroErrors>({});
+  const { validateAllInputs } = useValidation();
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    const macroType = name as MacroType;
+    
     setMacros(prevMacros => ({
       ...prevMacros,
-      [name]: value
+      [macroType]: value
     }));
     
-    setErrors(prevErrors => ({
-      ...prevErrors,
-      [name]: validateInput(value)
-    }));
-  };
-
-  const handleSubmit = () => {
-    const newErrors = {
-      protein: validateInput(macros.protein),
-      fats: validateInput(macros.fats),
-      carbs: validateInput(macros.carbs)
-    };
-
-    setErrors(newErrors);
-
-    if (Object.values(newErrors).every(error => error === '')) {
-      const numericMacros: NumericMacros = {
-        protein: parseInt(macros.protein),
-        fats: parseInt(macros.fats),
-        carbs: parseInt(macros.carbs)
-      };
-      onSubmit(numericMacros);
+    // Clear error when user starts typing
+    if (errors[macroType]) {
+      setErrors(prevErrors => {
+        const newErrors = { ...prevErrors };
+        delete newErrors[macroType];
+        return newErrors;
+      });
     }
-  };
+  }, [errors]);
 
-  const calculateCalories = (grams: string, multiplier: number): string => {
-    const parsedGrams = parseInt(grams) || 0;
-    return (parsedGrams * multiplier).toFixed(0);
-  };
+  const handleSubmit = useCallback(() => {
+    const validationErrors = validateAllInputs(macros);
+    
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    const numericMacros = convertToNumericMacros(macros);
+    onSubmit(numericMacros);
+  }, [macros, validateAllInputs, onSubmit]);
+
+  const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSubmit();
+    }
+  }, [handleSubmit]);
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4 border-blue-900 border-2 rounded-xl">
-      <h2 className="text-3xl font-bold mb-6 text-center">Enter Your Macros</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
-        {[
-          { key: 'protein', label: 'Protein', multiplier: 4 },
-          { key: 'fats', label: 'Fats', multiplier: 9 },
-          { key: 'carbs', label: 'Carbs', multiplier: 4 }
-        ].map(({ key, label, multiplier }) => (
-          <div key={key} className="flex flex-col">
-            <label className="mb-2 text-lg font-semibold text-gray-700">{label} (grams):</label>
-            <input
-              type="text"
-              name={key}
-              value={macros[key as keyof Macros]}
-              onChange={handleInputChange}
-              className={`w-24 h-12 p-3 border-2 ${errors[key as keyof Macros] ? 'border-red-500' : 'border-blue-950'} rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg`}
-              placeholder=""
-            />
-            {errors[key as keyof Macros] && (
-              <span className="mt-1 text-xs text-red-500">{errors[key as keyof Macros]}</span>
-            )}
-            <span className="mt-2 text-sm text-gray-600">{calculateCalories(macros[key as keyof Macros], multiplier)} calories</span>
-          </div>
-        ))}
-      </div>
-      <div className="mt-8 flex justify-center">
-        <button 
-          onClick={handleSubmit}
-          className="bg-blue-950 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl transition-colors duration-200 text-lg"
-        >
-          Submit Macros
-        </button>
-      </div>
+    <div className="w-full max-w-4xl mx-auto p-6 border-2 border-blue-900 rounded-xl bg-white shadow-lg">
+      <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">
+        Enter Your Macros
+      </h2>
+      
+      <form 
+        onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}
+        className="space-y-6"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {(Object.entries(MACRO_TYPES) as [MacroType, typeof MACRO_TYPES[MacroType]][]).map(
+            ([key, config]) => (
+              <div key={key} className="flex flex-col space-y-2">
+                <label 
+                  htmlFor={key}
+                  className="text-lg font-semibold text-gray-700"
+                >
+                  {config.label} ({config.unit}):
+                </label>
+                
+                <input
+                  id={key}
+                  type="text"
+                  name={key}
+                  value={macros[key]}
+                  onChange={handleInputChange}
+                  onKeyPress={handleKeyPress}
+                  className={`
+                    w-full h-12 px-4 py-2 text-lg border-2 rounded-xl
+                    transition-all duration-200 focus:outline-none focus:ring-2
+                    ${errors[key] 
+                      ? 'border-red-500 focus:border-red-500 focus:ring-red-200' 
+                      : 'border-blue-950 focus:border-blue-500 focus:ring-blue-200'
+                    }
+                  `}
+                  placeholder="0"
+                  aria-invalid={!!errors[key]}
+                  aria-describedby={errors[key] ? `${key}-error` : `${key}-calories`}
+                />
+                
+                {errors[key] && (
+                  <span 
+                    id={`${key}-error`}
+                    className="text-sm text-red-500 font-medium"
+                    role="alert"
+                  >
+                    {errors[key]}
+                  </span>
+                )}
+                
+                <span 
+                  id={`${key}-calories`}
+                  className="text-sm text-gray-600"
+                >
+                  {calculateCalories(macros[key], config.multiplier)} calories
+                </span>
+              </div>
+            )
+          )}
+        </div>
+
+        <div className="flex justify-center pt-4">
+          <button 
+            type="submit"
+            className="
+              bg-blue-950 hover:bg-blue-800 active:bg-blue-900
+              text-white font-bold py-3 px-8 rounded-xl
+              transition-colors duration-200 text-lg
+              focus:outline-none focus:ring-2 focus:ring-blue-300
+              disabled:opacity-50 disabled:cursor-not-allowed
+            "
+          >
+            Submit Macros
+          </button>
+        </div>
+      </form>
     </div>
   );
 };
