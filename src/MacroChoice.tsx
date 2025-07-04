@@ -181,7 +181,7 @@ const MacroInput: React.FC<MacroInputProps> = ({ onSubmit }) => {
             "
           >
             Submit Macros
-          </button>
+          </button> 
         </div>
       </form>
     </div>

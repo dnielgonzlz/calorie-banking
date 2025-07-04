@@ -20,7 +20,7 @@ export const useMacroCalculation = ({
   const { validateAllInputs, validateAllInputsForSubmit, hasErrors } = useFormValidation();
 
   // Memoize the onCalculate callback to prevent infinite loops
-  const memoizedOnCalculate = useCallback(onCalculate, []);
+  const memoizedOnCalculate = useCallback(onCalculate, [onCalculate]);
 
   // Validate user inputs (only show errors for touched fields)
   const validationErrors = useMemo(() => {
